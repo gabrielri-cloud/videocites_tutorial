@@ -1,14 +1,20 @@
-# start with running:
 
-docker exec -it prefix_finder_redis_1 redis-cli
+# to run on the background the server
 
-# then to check the docker is up:
+docker-compose up -d
+
+# check the docker is up:
 
 docker-compose ps
 
 # then run the main.py
 
+C:\Users\gabri\anaconda3\python.exe main.py
 main.py
+
+#to kill on the background
+
+docker kill prefix_finder_redis_1
 
 
 
@@ -25,3 +31,7 @@ docker run gabriel-docker
 # check to see if exist
 
 docker images
+
+
+#docker exec -it prefix_finder_redis_1 redis-cli
+

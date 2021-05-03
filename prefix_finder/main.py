@@ -20,9 +20,22 @@ class PrefixFinder:
                 number_string += str(0).zfill(3)
         return int(number_string)
 
-    # not in use
-    def __change_to_int_max(self, s):
+    def __change_to_int_version2(self, s):
+        number_string = ''
+        len_string = len(s)
+        for i in range(0, self.name_max_length):
+            if i < len_string:
+                if 'a' <= s[i] <= 'z':
+                    number_string += str(ord(s[i]) - ord('a')).zfill(2)
+                elif 'A' <= s[i] <= 'Z':
+                    number_string += str(ord(s[i]) - ord('A')).zfill(2)
+                else:
+                    print('error - not an ABC character')
+            else:
+                number_string += str(0).zfill(2)
+        return int(number_string)
 
+    def __change_to_int_max(self, s):
         number_string = ''
         len_string = len(s)
         for i in range(0, self.name_max_length):
@@ -34,6 +47,30 @@ class PrefixFinder:
                 number_string += str(0).zfill(3)
         return int(number_string)
 
+    def __change_to_int_max_version2(self, s):
+        number_string = ''
+        len_string = len(s)
+        for i in range(0, self.name_max_length):
+            if i == len_string-1:
+                if 'a' <= s[i] <= 'z':
+                    number_string += str(ord(s[i]) - ord('a') + 1).zfill(2)
+                elif 'A' <= s[i] <= 'Z':
+                    number_string += str(ord(s[i]) - ord('A') + 1).zfill(2)
+                else:
+                    print('error - not an ABC character')
+            elif i < len_string:
+                if 'a' <= s[i] <= 'z':
+                    number_string += str(ord(s[i]) - ord('a')).zfill(2)
+                elif 'A' <= s[i] <= 'Z':
+                    number_string += str(ord(s[i]) - ord('A')).zfill(2)
+                else:
+                    print('error - not an ABC character')
+            else:
+                number_string += str(0).zfill(2)
+        return int(number_string)
+
+
+
 
     def add_name(self, name):
         # string key
@@ -43,8 +80,10 @@ class PrefixFinder:
         self.client.lpush('list', name)
 
         # sorted set key
-        tmp_key = self.__change_to_int(name)
-        print(f'f key: {tmp_key}, value: {name}')
+        if len(name) > self.name_max_length:
+            return
+        tmp_key = self.__change_to_int_version2(name)
+        print(f'key: {tmp_key}, value: {name}')
         self.client.zadd('set', {name: tmp_key})
 
 
@@ -71,11 +110,12 @@ class PrefixFinder:
         key_list_redis = key_list_redis[0:max_amount]
         print(f'key_list_redis: {key_list_redis}')
 
-        # sorted set option, this work only if the name added is less than 10 digits, I think its the best option.
-        min = self.__change_to_int(prefix)
-        max = self.__change_to_int_max(prefix)
+        # sorted set option, this work only if the names added are less than 10 digits, I think its the best option.
+        min = self.__change_to_int_version2(prefix)
+        max = self.__change_to_int_max_version2(prefix)
         sort_set_list_redis = self.client.zrangebyscore(b'set', min=min, max=max, start=0, num=max_amount)
         print(f'sort_set_list_redis: {sort_set_list_redis}')
+
 
 
 # Press the green button in the gutter to run the script.
@@ -83,14 +123,15 @@ if __name__ == '__main__':
 
     port = 6379
     client_prefix = PrefixFinder(port)
-    client_prefix.add_name("va")
+    client_prefix.add_name("Va")
     client_prefix.add_name("vb")
     client_prefix.add_name("vca")
+    client_prefix.add_name("Vca")
     client_prefix.add_name("vcava")
     client_prefix.add_name("vcavas")
     client_prefix.add_name("vda")
     client_prefix.add_name("b")
     client_prefix.add_name("b")
     client_prefix.add_name("aa")
-    client_prefix.got_names("v", 3)
+    client_prefix.got_names("v", 4)
 

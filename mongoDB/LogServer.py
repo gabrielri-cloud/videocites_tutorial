@@ -12,9 +12,7 @@ class LogServer:
                         tls=True,
                         tlsAllowInvalidCertificates=True)
         self.logs_db = client.logs
-
-        logging.basicConfig(filename='LogServer.log', level=logging.INFO, filemode='w', format='%(message)s')
-        logging.getLogger('LogServer').addHandler(logging.FileHandler('LogServer.log'))
+        logging.basicConfig(filename='LogServer.log', level=logging.DEBUG, filemode='w', format='%(message)s')
         logging.info(f'task_id\t\t\ttime stamp\t\t\t\ttext')
 
     def add_log(self, task_id, time_stamp, text):
@@ -36,11 +34,9 @@ class LogServer:
                 {"_id": {"$lte": end}}
             ]
         }
-        #print(f'### generate log info of task id: {task_id}###')
         for object in log_of_task_id.find(query):
             tmp_stamp = object['time_stamp']
             tmp_text = object['text']
-            #print(f'time_stamp - {t_stamp}, text - {t_text}')
             logging.info(f'{task_id}\t\t\t\t{tmp_stamp}\t\t\t\t\t\t{tmp_text}')
 
     def clean_DB(self):

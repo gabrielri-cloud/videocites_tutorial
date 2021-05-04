@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+import logging
 
 
 class LogServer:
@@ -11,6 +12,10 @@ class LogServer:
                         tls=True,
                         tlsAllowInvalidCertificates=True)
         self.logs_db = client.logs
+
+        logging.basicConfig(filename='LogServer.log', level=logging.INFO, filemode='w', format='%(message)s')
+        logging.getLogger('LogServer').addHandler(logging.FileHandler('LogServer.log'))
+        logging.info(f'task_id\t\t\ttime stamp\t\t\t\ttext')
 
     def add_log(self, task_id, time_stamp, text):
         entry = {
@@ -31,12 +36,13 @@ class LogServer:
                 {"_id": {"$lte": end}}
             ]
         }
-        print(f'### generate log info of task id: {task_id}###')
+        #print(f'### generate log info of task id: {task_id}###')
         for object in log_of_task_id.find(query):
-            t_stamp = object['time_stamp']
-            t_text = object['text']
-            print(f'time_stamp - {t_stamp}, text - {t_text}')
+            tmp_stamp = object['time_stamp']
+            tmp_text = object['text']
+            #print(f'time_stamp - {t_stamp}, text - {t_text}')
+            logging.info(f'{task_id}\t\t\t\t{tmp_stamp}\t\t\t\t\t\t{tmp_text}')
 
-    def clean_logs(self):
-        list_collections = self.logs_db.list_collections()
-        self.logs_db["1"].delete_many({})
+    def clean_DB(self):
+        for collection_name in self.logs_db.list_collection_names():
+            self.logs_db[collection_name].delete_many({})

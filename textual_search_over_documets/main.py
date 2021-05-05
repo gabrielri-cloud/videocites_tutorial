@@ -6,7 +6,7 @@ if __name__ == '__main__':
     input_doc = {
         'id': 200,
         'author': 'kimchy',
-        'title1': 'heee: gogi. bonsai cool.',
+        'title1': 'heee: gogiga. bonsai cool.',
         'title2': 'Elasticsearch: cool. bonsai c.',
         'timestamp': datetime.now(),
         'nested1': {
@@ -17,16 +17,16 @@ if __name__ == '__main__':
     input_doc2 = {
         'id': 201,
         'author': 'kimchy',
-        'title1': 'heeey: gogig. bonsai cool.',
+        'title1': 'heeey: gogigaa. bonsai cool.',
         'title2': 'Elasticsearch: cool. bonsai c.',
         'timestamp': datetime.now(),
         'nested1': {
-            'nested2': 'eaeee',
+            'nested2': 'eaeeea',
         },
         'desc': 'khbuvkjb'
     }
     input_key = 'id'
-    input_look_for = 'heeey'
+    input_look_for = 'gogigA'
     input_list_fields = ['title1', 'title2', 'nested1.nested2']
     input_object_type = 1
 

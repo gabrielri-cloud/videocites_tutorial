@@ -1,6 +1,7 @@
 from text_search_over_documets_abc_meta import TextSearchDocumentABCMeta
 from elasticsearch import Elasticsearch
 from enum import Enum
+import math
 
 
 class TextSearchDocuments(TextSearchDocumentABCMeta):
@@ -33,10 +34,10 @@ class TextSearchDocuments(TextSearchDocumentABCMeta):
             keys_result_list.append(search_result['_source']['key'])
         return keys_result_list
 
-    def check_for_text(self, object_type, string_look_for) -> list:
+    def check_for_text(self, object_type, string_look_for, max_list_size) -> list:
         query = self._make_query(string_look_for=string_look_for)
         search_index = self._get_index_from_object_type(object_type)
-        search_result_list = self.es.search(index=search_index, body=query)
+        search_result_list = self.es.search(index=search_index, body=query, size=max_list_size)
         '''search_result = self.es.get(index=search_index, id=0)['_source']
         print(search_result)
         search_result = self.es.get(index=search_index, id=1)['_source']

@@ -2,6 +2,9 @@ from text_index_documents_abc_meta import TextIndexDocumentsABCMeta
 from elasticsearch import Elasticsearch
 from enum import Enum
 
+from threading import Thread
+
+
 
 class TextIndexDocuments(TextIndexDocumentsABCMeta):
     # TODO
@@ -39,18 +42,25 @@ class TextIndexDocuments(TextIndexDocumentsABCMeta):
         #  documents?
         # TODO change to enum
         index_in = f"{object_type}_index"
-        #res = self.es.index(index=index_in, id=tmp_i, body=document_to_add, refresh='wait_for')
         res = self.es.index(index=index_in, id=tmp_i, body=document_to_add)
-
         if res['result'] != 'updated':
             raise RuntimeError('document was not updated to elasticsearch')
 
+    def _add_document(self, document, search_field_list, key, object_type, i):
+        text_to_current_doc = self._get_text_from_document_fields(document=document,
+                                                                  search_field_list=search_field_list)
+        document_to_add = self._create_search_document(document=document, text=text_to_current_doc,
+                                                       key=key)
+        self._insert_document(object_type=object_type, document_to_add=document_to_add,
+                              tmp_i=i)  # TODO change tmp_i, need to know something unique so it wont be overwritten
     def add_documents(self, docs_to_check_list, search_field_list, key, object_type):
+        thread_list = []
         for i, document in enumerate(docs_to_check_list):
-            text_to_current_doc = self._get_text_from_document_fields(document=document,
-                                                                      search_field_list=search_field_list)
-            document_to_add = self._create_search_document(document=document, text=text_to_current_doc,
-                                                           key=key)
-            self._insert_document(object_type=object_type, document_to_add=document_to_add,
-                                  tmp_i=i)  # TODO change tmp_i, need to know something unique so it wont be overwritten
+            thread = Thread(target=self._add_document, args=(document, search_field_list, key, object_type, i))
+            thread_list.append(thread)
+            thread.start()
+        for thread in thread_list:
+            thread.join()
         self.es.indices.refresh()
+
+
